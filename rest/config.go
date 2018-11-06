@@ -37,6 +37,7 @@ import (
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	certutil "k8s.io/client-go/util/cert"
 	"k8s.io/client-go/util/flowcontrol"
+	"k8s.io/client-go/util/homedir"
 )
 
 const (
@@ -313,10 +314,9 @@ func DefaultKubernetesUserAgent() string {
 // running inside a pod running on kubernetes. It will return ErrNotInCluster
 // if called from a process not running in a kubernetes environment.
 func InClusterConfig() (*Config, error) {
-	const (
-		tokenFile  = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-		rootCAFile = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-	)
+	tokenFile = filepath.Join(homedir.HomeDir(), "/var/run/secrets/kubernetes.io/serviceaccount/token")
+	rootCAFile = filepath.Join(homedir.HomeDir(), "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+
 	host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
 	if len(host) == 0 || len(port) == 0 {
 		return nil, ErrNotInCluster
